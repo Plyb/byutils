@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "byutils"
+version = "0.1.0"
+description = "Cache-aware HuggingFace loading utilities for BYU ORC supercomputer"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    {name = "Koby Long", email = "kobyjl@byu.edu"}
+]
+dependencies = [
+    "transformers>=4.30.0",
+    "datasets>=2.0.0",
+    "huggingface-hub>=0.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+]
+
+[tool.setuptools]
+packages = ["byutils"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
