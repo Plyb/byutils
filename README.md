@@ -16,17 +16,8 @@ BYUtils provides drop-in replacements for HuggingFace loaders that automatically
 
 ## Installation
 
-### From source (development)
-
 ```bash
-cd /home/kobyjl/util-projects/byutils
-pip install -e .
-```
-
-### For use in other projects
-
-```bash
-pip install -e /home/kobyjl/util-projects/byutils
+pip install git+https://github.com/Plyb/byutils.git
 ```
 
 ## Quick Start
@@ -305,7 +296,7 @@ BYUtils uses a three-tier detection strategy:
 
 If you see:
 ```
-CacheMissError: Cache miss: 'model-name' not found in /home/kobyjl/nobackup/autodelete/hf_cache/models
+CacheMissError: Cache miss: 'model-name' not found in /home/<netid>/nobackup/autodelete/hf_cache/models
 ```
 
 **Solution:** Run prefetch on a login node:
@@ -343,13 +334,6 @@ python -c "from byutils import load_model; print(load_model('gpt2'))"
 # Test prefetch
 python -c "from byutils import prefetch_model; prefetch_model('gpt2')"
 ```
-
-### Contributing
-
-This is an internal BYU tool. For improvements:
-1. Make changes in `/home/kobyjl/util-projects/byutils`
-2. Test on both login and compute nodes
-3. Update documentation as needed
 
 ## License
 
