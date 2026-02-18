@@ -9,7 +9,7 @@ description = "Cache-aware HuggingFace loading utilities for BYU ORC supercomput
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [
-    {name = "Koby Long", email = "kobyjl@byu.edu"}
+    {name = "Koby Lewis"}
 ]
 dependencies = [
     "transformers>=4.30.0",
