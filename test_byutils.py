@@ -1,7 +1,6 @@
 """Test script for byutils library."""
 
 import sys
-sys.path.insert(0, '/home/kobyjl/util-projects/byutils')
 
 from byutils import (
     load_model,
