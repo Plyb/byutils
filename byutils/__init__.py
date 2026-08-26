@@ -27,6 +27,12 @@ __version__ = "0.1.0"
 
 from ._config import Config, AUTODELETE_DIR, ARCHIVE_DIR
 from ._connectivity import is_login_node
+
+# Set up the HF environment BEFORE importing loaders: loaders import huggingface_hub, which
+# freezes its cache path (HF_HUB_CACHE) and related settings into module constants at import
+# time -- so HF_HOME must be exported first or it silently has no effect.
+Config.setup_environment()
+
 from .loaders import (
     load_model,
     load_tokenizer,
@@ -40,9 +46,6 @@ from .exceptions import (
     CacheMissError,
     InternetRequiredError,
 )
-
-# Set up environment on import
-Config.setup_environment()
 
 __all__ = [
     # Main loading functions
