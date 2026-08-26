@@ -26,6 +26,7 @@ Storage paths for use in other projects:
 __version__ = "0.1.0"
 
 from ._config import Config, AUTODELETE_DIR, ARCHIVE_DIR
+from ._connectivity import is_login_node
 from .loaders import (
     load_model,
     load_tokenizer,
@@ -56,6 +57,8 @@ __all__ = [
     "Config",
     "AUTODELETE_DIR",
     "ARCHIVE_DIR",
+    # Connectivity
+    "is_login_node",
     # Exceptions
     "BYUtilsError",
     "CacheMissError",
