@@ -2,7 +2,9 @@
 
 from typing import Optional, Any, Union
 from pathlib import Path
+import json
 import os
+import shutil
 
 try:
     from transformers import (
@@ -175,9 +177,7 @@ def load_dataset(
     cache = cache_dir or str(Config.get_datasets_cache())
     allow_dl = should_allow_download(force_download=allow_download)
 
-    # Construct the dataset cache path
-    dataset_cache_path = Path(cache) / path / (name if name else "")
-    dataset_cache_path = dataset_cache_path.resolve()
+    dataset_cache_path = _dataset_cache_path(Path(cache), path, name, kwargs.get("split"))
 
     # If offline mode and cache exists, load directly from disk to avoid network requests
     if not allow_dl and os.path.exists(dataset_cache_path):
@@ -197,6 +197,7 @@ def load_dataset(
     try:
         ds = hf_load_dataset(path, name, **kwargs)
 
+        _remove_saved_dataset(dataset_cache_path)
         ds.save_to_disk(dataset_cache_path)
 
         return ds
@@ -205,6 +206,29 @@ def load_dataset(
             resource_id = f"{path}/{name}" if name else path
             raise CacheMissError(resource_id, cache) from e
         raise
+
+
+def _dataset_cache_path(cache: Path, path: str, name: Optional[str], split: Optional[str]) -> Path:
+    """Each split gets its own sibling directory; otherwise loading several splits of one
+    dataset offline would return whichever split was saved last."""
+    dataset_cache_path = (cache / path / (name if name else "")).resolve()
+    if split is None:
+        return dataset_cache_path
+    return dataset_cache_path.with_name(f"{dataset_cache_path.name}@split={split}")
+
+
+def _remove_saved_dataset(dataset_cache_path: Path) -> None:
+    """Delete what an earlier save_to_disk wrote here, so a Dataset saved over a DatasetDict (or
+    the reverse) can't leave files that load_from_disk would pick up instead. Other entries stay:
+    a named config's cache lives inside the unnamed one's directory."""
+    dataset_dict_json = dataset_cache_path / "dataset_dict.json"
+    if dataset_dict_json.exists():
+        for split in json.loads(dataset_dict_json.read_text())["splits"]:
+            shutil.rmtree(dataset_cache_path / split, ignore_errors=True)
+    for saved_file in ["dataset_dict.json", "state.json", "dataset_info.json", *(
+        entry.name for entry in dataset_cache_path.glob("data-*.arrow")
+    )]:
+        (dataset_cache_path / saved_file).unlink(missing_ok=True)
 
 
 def load_pipeline(
