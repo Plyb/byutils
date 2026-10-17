@@ -1,31 +1,20 @@
 """HuggingFace loading functions with cache awareness."""
 
-from typing import Optional, Any, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional, Any, Union
 from pathlib import Path
 import json
 import os
 import shutil
 
-try:
-    from transformers import (
-        AutoModel,
-        AutoModelForCausalLM,
-        AutoModelForSeq2SeqLM,
-        AutoTokenizer,
-        pipeline,
-        Pipeline,
-    )
-    from datasets import load_dataset as hf_load_dataset, Dataset, DatasetDict, load_from_disk
-    from huggingface_hub import snapshot_download
-except ImportError as e:
-    raise ImportError(
-        f"Required dependencies not found: {e}\n"
-        "Please install with: pip install transformers datasets huggingface-hub"
-    ) from e
-
 from ._config import Config
 from ._connectivity import should_allow_download
 from .exceptions import CacheMissError
+
+if TYPE_CHECKING:
+    from transformers import AutoTokenizer, Pipeline
+    from datasets import Dataset, DatasetDict
 
 
 def _get_cached_model_path(
@@ -47,6 +36,8 @@ def _get_cached_model_path(
     Raises:
         CacheMissError: If model not in cache and downloads disabled
     """
+    from huggingface_hub import snapshot_download
+
     cache = cache_dir or str(Config.get_models_cache())
     allow_dl = should_allow_download(force_download=allow_download)
 
@@ -97,6 +88,8 @@ def load_model(
         ...     device_map="auto"
         ... )
     """
+    from transformers import AutoModel
+
     if model_class is None:
         model_class = AutoModel
 
@@ -136,6 +129,8 @@ def load_tokenizer(
         >>> from byutils import load_tokenizer
         >>> tokenizer = load_tokenizer("meta-llama/Llama-3.1-8B-Instruct")
     """
+    from transformers import AutoTokenizer
+
     model_path = _get_cached_model_path(model_id, cache_dir, allow_download)
 
     # Force local_files_only
@@ -174,6 +169,8 @@ def load_dataset(
         >>> from byutils import load_dataset
         >>> dataset = load_dataset("lmsys/lmsys-chat-1m")
     """
+    from datasets import load_dataset as hf_load_dataset, load_from_disk
+
     cache = cache_dir or str(Config.get_datasets_cache())
     allow_dl = should_allow_download(force_download=allow_download)
 
@@ -265,6 +262,8 @@ def load_pipeline(
         ...     device_map="auto"
         ... )
     """
+    from transformers import pipeline
+
     if model is not None:
         model_path = _get_cached_model_path(model, cache_dir, allow_download)
         kwargs.setdefault("model", model_path)
