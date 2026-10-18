@@ -56,6 +56,16 @@ model = load_model("meta-llama/Llama-3.1-8B-Instruct")
 dataset = load_dataset("lmsys/lmsys-chat-1m")
 ```
 
+### GPU partition/QOS picker
+
+Rank partition/QOS options for a single-node GPU job from live Slurm state; the last line is a suggested sbatch line.
+
+```bash
+python -m byutils.gpu_pick --hours 3 --vram-gb 130 --cpus 24 --mem-gb 200 --exclude-qos dw87
+```
+
+From Python: `suggested_sbatch_flags(ranked_gpu_candidates(request), request)` with a `JobRequest`.
+
 ## API Reference
 
 ### Loading Functions
